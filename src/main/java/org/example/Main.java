@@ -75,7 +75,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Path path = Path.of("/home/rennud/java/JavaStreamsTwo");
+        Path path = Path.of("ABSOLUTE PATH TO PROJECT ROOT DIR");
         List<Path> allFiles = getAllFiles(path);
         List<File> fileDataList = createListOfFileObjects(allFiles);
 
