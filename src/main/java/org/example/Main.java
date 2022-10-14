@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.pojo.File;
+import org.example.pojo.FileObj;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,83 +12,109 @@ import java.util.stream.Stream;
 
 public class Main {
 
-    // Getting all files that in project
+
+    /**
+     *
+     * @param rootDir => root dir of the project
+     * @return all files that project contain
+     */
     public static List<Path> getAllFiles(Path rootDir) {
         try (Stream<Path> walk = Files.walk(rootDir)) {
             return walk
                     .filter(Files::isRegularFile)
                     .toList();
-        } catch (IOException exception) {
-            throw new RuntimeException(exception);
+        } catch (IOException e) {
+            throw new RuntimeException("Caught IOException: " +  e.getMessage());
         }
     }
 
-    // Creating List of objects(File) - fileName, fileSize
-    public static List<File> createListOfFileObjects(List<Path> allFiles) {
+    /**
+     *
+     * @param allFiles => List of all files that project contain
+     * @return List of FileObj
+     */
+    public static List<FileObj> createListOfFileObjects(List<Path> allFiles) {
         return allFiles.stream()
-                .map(file -> {
-                    try {
-                        return File.builder()
-                                .fileName(file.getFileName())
-                                .fileSize((int) Files.size(file))
-                                .build();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList();
+                .map(FileObj::createFileObj)
+                .toList();
     }
 
-    // Getting all java files -> ends with .java extension
-    // -> Argument all project files(As arg. using output from createListOfFileObjects method)
-    public static List<Path> getOnlyJavaFiles(List<File> filesData) {
+    /**
+     *
+     * @param filesData => List of FileObj(output from createListOfFileObjects method)
+     * @return List of java files => ends with .java extension
+     */
+    public static List<Path> getOnlyJavaFiles(List<FileObj> filesData) {
         return filesData
                 .stream()
-                .map(File::getFileName)
+                .map(FileObj::getFileName)
                 .filter(path -> path.toString().endsWith(".java"))
                 .map(Path::getFileName)
                 .toList();
     }
 
-    // Getting the largest files
-    // -> Argument all project files(As arg. using output from createListOfFileObjects method)
-    public static Optional<File> getTheLargestFile(List<File> filesData) {
+    /**
+     *
+     * @param filesData - List of FileObj(output from createListOfFileObjects method)
+     * @return The largest file in the project
+     */
+    public static Optional<FileObj> getTheLargestFile(List<FileObj> filesData) {
         return filesData
                 .stream()
-                .max(Comparator.comparing(File::getFileSize));
+                .max(Comparator.comparing(FileObj::getFileSize));
     }
 
-    // Getting the largest files
-    // -> Argument all project files(As arg. using output from createListOfFileObjects method)
-    public static Optional<File> getTheSmallestFile(List<File> filesData) {
+//    public static OptionalLong getTheLargestFile(List<FileObj> filesData) {
+//        return filesData
+//                .stream()
+//                .mapToLong(FileObj::getFileSize)
+//                .min();
+//    }
+
+    /**
+     *
+     * @param filesData - List of FileObj(output from createListOfFileObjects method)
+     * @return The smallest file in the project
+     */
+    public static Optional<FileObj> getTheSmallestFile(List<FileObj> filesData) {
         return filesData
                 .stream()
-                .min(Comparator.comparing(File::getFileSize));
+                .min(Comparator.comparing(FileObj::getFileSize));
     }
 
-    // Getting the total size of all files in the project
-    // -> Argument all project files(As arg. using output from createListOfFileObjects method)
-    public static Optional<Integer> getProjectTotalSize(List<File> filesData) {
+//    public static OptionalLong getTheSmallestFile(List<FileObj> filesData) {
+//        return filesData
+//                .stream()
+//                .mapToLong(FileObj::getFileSize)
+//                .min();
+//    }
+
+    /**
+     *
+     * @param filesData - List of FileObj(output from createListOfFileObjects method)
+     * @return Total size of the project in bytes
+     */
+    public static long getProjectTotalSize(List<FileObj> filesData) {
         return filesData
                 .stream()
-                .map(File::getFileSize)
-                .reduce(Integer::sum);
+                .mapToLong(FileObj::getFileSize)
+                .sum();
     }
 
     public static void main(String[] args) {
-        Path path = Path.of("ABSOLUTE PATH TO PROJECT ROOT DIR");
+        Path path = Path.of(".");
         List<Path> allFiles = getAllFiles(path);
-        List<File> fileDataList = createListOfFileObjects(allFiles);
-
+        List<FileObj> fileObjDataList = createListOfFileObjects(allFiles);
         System.out.println("Task #1");
-        System.out.println("All .java files: " + getOnlyJavaFiles(fileDataList) + ".");
+        System.out.println("All .java files: " + getOnlyJavaFiles(fileObjDataList) + ".");
         System.out.println("---");
         System.out.println("Task #2");
-        System.out.println("Largest file: " + getTheLargestFile(fileDataList));
+        System.out.println("Largest file: " + getTheLargestFile(fileObjDataList));
         System.out.println("---");
         System.out.println("Task #3");
-        System.out.println("Smallest file: " + getTheSmallestFile(fileDataList));
+        System.out.println("Smallest file: " + getTheSmallestFile(fileObjDataList));
         System.out.println("---");
         System.out.println("Task #4");
-        System.out.println("Total size of project: " + getProjectTotalSize(fileDataList) + " bytes.");
+        System.out.println("Total size of project: " + getProjectTotalSize(fileObjDataList) + " bytes.");
     }
 }
