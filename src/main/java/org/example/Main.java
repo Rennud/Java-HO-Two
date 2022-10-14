@@ -24,7 +24,7 @@ public class Main {
                     .filter(Files::isRegularFile)
                     .toList();
         } catch (IOException e) {
-            throw new RuntimeException("Caught IOException: " +  e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

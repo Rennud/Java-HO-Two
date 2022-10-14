@@ -33,7 +33,7 @@ public class FileObj {
                     .fileSize(Files.size(file))
                     .build();
         } catch (IOException e) {
-            throw new RuntimeException("My message");
+            throw new RuntimeException(e);
         }
     }
 }
